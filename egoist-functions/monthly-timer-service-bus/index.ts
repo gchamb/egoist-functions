@@ -28,13 +28,19 @@ const monthlyTimer: AzureFunction = async function (
   const expiredSubscribers = expiredSubsData.flatMap((val) => val.id);
   const allIds = [...unsubscribedUserIds, ...expiredSubscribers];
   const yesterday = new Date(
-    date.getFullYear(),
-    date.getMonth(),
-    date.getDate() - 1
+    date.getUTCFullYear(),
+    date.getUTCMonth(),
+    date.getUTCDate() - 1
   );
-  const startDate = `${yesterday.getFullYear()}-${yesterday.getMonth() + 1}-01`;
-  const endDate = `${yesterday.getFullYear()}-${yesterday.getMonth() + 1}-${
-    yesterday.getDate() > 10 ? yesterday.getDate() : `0${yesterday.getDate()}`
+  const startDate = `${yesterday.getUTCFullYear()}-${
+    yesterday.getUTCMonth() + 1
+  }-01`;
+  const endDate = `${yesterday.getUTCFullYear()}-${
+    yesterday.getUTCMonth() + 1
+  }-${
+    yesterday.getUTCDate() > 10
+      ? yesterday.getUTCDate()
+      : `0${yesterday.getUTCDate()}`
   }`;
 
   return allIds.map((id) => {

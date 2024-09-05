@@ -2,7 +2,7 @@
   "bindings": [
     {
       "type": "timerTrigger",
-      "name": "monthlyTimer",
+      "name": "weeklyTimer",
       "direction": "in",
       "schedule": "0 0 5 * * 0"
     },
