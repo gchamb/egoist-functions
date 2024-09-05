@@ -1,10 +1,10 @@
 import { defineConfig } from "drizzle-kit";
 
 export default defineConfig({
-  schema: "./src/db/schema.ts",
+  schema: "./db/schema.ts",
   dialect: "mysql",
-  out: "./src/db",
+  out: "./db",
   dbCredentials: {
-    url: process.env.MYSQL_CONNECTION_STRING,
+    url: process.env.MySqlConnectionString,
   },
 });
