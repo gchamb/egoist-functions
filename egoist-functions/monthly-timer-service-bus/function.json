@@ -1,0 +1,18 @@
+{
+  "bindings": [
+    {
+      "type": "timerTrigger",
+      "name": "monthlyTimer",
+      "direction": "in",
+      "schedule": "0 0 5 1 * *"
+    },
+    {
+      "type": "serviceBus",
+      "direction": "out",
+      "name": "$return",
+      "connection": "ServiceBusConnectionString",
+      "queueName": "egoist"
+    }
+  ],
+  "scriptFile": "../dist/monthly-timer-service-bus/index.js"
+}

@@ -43,5 +43,3 @@ const monthlyTimer: AzureFunction = async function (
 };
 
 export default monthlyTimer;
-
-//weekly  - 0 0 5 * * 0
