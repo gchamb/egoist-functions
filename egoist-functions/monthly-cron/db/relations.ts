@@ -14,11 +14,11 @@ export const progressEntryRelations = relations(progressEntry, ({ one }) => ({
   }),
 }));
 
-export const userRelations = relations(user, ({ many, one }) => ({
+export const userRelations = relations(user, ({ many }) => ({
   progressEntries: many(progressEntry),
   progressReports: many(progressReport),
   progressVideos: many(progressVideo),
-  revenueCatSubscribers: one(revenueCatSubscriber),
+  revenueCatSubscribers: many(revenueCatSubscriber),
 }));
 
 export const progressReportRelations = relations(progressReport, ({ one }) => ({

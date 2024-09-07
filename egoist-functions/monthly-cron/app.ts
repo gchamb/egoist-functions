@@ -1,13 +1,24 @@
-import { AzureFunction, Context, Timer } from "@azure/functions";
-import { lt, sql } from "drizzle-orm";
-import { db } from "../db";
-import { revenueCatSubscriber, user } from "../db/schema";
+import { APIGatewayProxyEvent } from "aws-lambda";
+import { sql, lt } from "drizzle-orm";
+import { db } from "./db";
+import { user, revenueCatSubscriber } from "./db/schema";
+import {
+  SendMessageBatchCommand,
+  SQSClient,
+  SendMessageBatchRequestEntry,
+} from "@aws-sdk/client-sqs";
+import "dotenv/config";
 
-const monthlyTimer: AzureFunction = async function (
-  context: Context,
-  timer: Timer
-) {
-  context.log("Timer function processed request.");
+const client = new SQSClient({
+  region: "us-east-2",
+  credentials: {
+    accessKeyId: process.env.MY_AWS_ACCESS_KEY_ID as string,
+    secretAccessKey: process.env.MY_AWS_SECRET_ACCESS_KEY as string,
+  },
+});
+const SQS_QUEUE_URL = process.env.SQS_QUEUE_URL as string;
+
+export const lambdaHandler = async (event: APIGatewayProxyEvent) => {
   const date = new Date();
   // all free users
   // expired paid users
@@ -43,9 +54,22 @@ const monthlyTimer: AzureFunction = async function (
       : `0${yesterday.getUTCDate()}`
   }`;
 
-  return allIds.map((id) => {
-    return { uid: id, frequency: "monthly", startDate, endDate };
-  });
-};
+  const entries = allIds
+    .map((id) => {
+      return { uid: id, frequency: "monthly", startDate, endDate };
+    })
+    .map((userMessage): SendMessageBatchRequestEntry => {
+      return {
+        Id: userMessage.uid,
+        MessageBody: JSON.stringify(userMessage),
+      };
+    });
 
-export default monthlyTimer;
+  // send to sqs
+  const command = new SendMessageBatchCommand({
+    QueueUrl: SQS_QUEUE_URL,
+    Entries: entries,
+  });
+
+  await client.send(command);
+};

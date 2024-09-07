@@ -5,6 +5,6 @@ export default defineConfig({
   dialect: "mysql",
   out: "./db",
   dbCredentials: {
-    url: process.env.MySqlConnectionString,
+    url: process.env.MYSQL_CONNECTION_STRING as string,
   },
 });
