@@ -41,7 +41,7 @@ export const progressReport = mysqlTable(
   {
     id: varchar("id", { length: 36 }).notNull(),
     currentWeight: float("current_weight").notNull(),
-    lastWeekWeight: float("last_week_weight").notNull(),
+    lastWeight: float("last_weight").notNull(),
     userId: varchar("user_id", { length: 36 })
       .notNull()
       .references(() => user.id),

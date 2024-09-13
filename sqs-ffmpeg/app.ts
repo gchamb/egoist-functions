@@ -1,7 +1,7 @@
 import { SQSEvent, Context } from "aws-lambda";
 import { eq, gte, and, lte } from "drizzle-orm";
 import { db } from "./db";
-import { progressEntry, progressVideo } from "./db/schema";
+import { progressEntry, progressReport, progressVideo } from "./db/schema";
 import {
   S3Client,
   GetObjectCommand,
@@ -69,9 +69,18 @@ export const lambdaHandler = async (event: SQSEvent, context: Context) => {
 
   console.log("tmp folders have been created");
 
+  let startDateEntry: typeof progressEntry.$inferSelect | undefined;
+  let endDateEntry: typeof progressEntry.$inferSelect | undefined;
   // pulls down the s3 images
   await Promise.all(
     entries.map(async (entry, index) => {
+      if (entry.createdAt === message.startDate) {
+        startDateEntry = entry;
+      }
+      if (entry.createdAt === message.endDate) {
+        endDateEntry = entry;
+      }
+
       // get image
       const command = new GetObjectCommand({
         Bucket: process.env.BUCKET_NAME as string,
@@ -132,6 +141,16 @@ export const lambdaHandler = async (event: SQSEvent, context: Context) => {
   });
 
   console.log("video has been inserted into progress-video ");
+
+  // insert progress-report record
+  if (startDateEntry !== undefined && endDateEntry !== undefined) {
+    await db.insert(progressReport).values({
+      id: crypto.randomUUID(),
+      currentWeight: endDateEntry.currentWeight,
+      lastWeight: startDateEntry.currentWeight,
+      userId: message.uid,
+    });
+  }
 
   // clear the tmp folder
   await fs.unlink("/tmp/images");
