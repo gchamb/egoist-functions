@@ -9,6 +9,8 @@ Description: >
 Globals:
   Function:
     Timeout: 3
+    Tags:
+        Env: dev
 
     # You can add LoggingConfig parameters such as the Logformat, Log Group, and SystemLogLevel or ApplicationLogLevel. Learn more here https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-function.html#sam-function-loggingconfig.
     LoggingConfig:
@@ -62,7 +64,7 @@ Resources:
         QueueTrigger:
           Type: SQS
           Properties:
-            Queue: arn:aws:sqs:us-east-2:563672049341:egoist-dev-queue
+            Queue: arn:aws:sqs:us-east-2:563672049341:egoistdevqueue
     Metadata:
       DockerTag: nodejs20.x-v1
       DockerContext: ./sqs-ffmpeg
