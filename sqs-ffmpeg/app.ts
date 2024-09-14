@@ -149,6 +149,7 @@ export const lambdaHandler = async (event: SQSEvent, context: Context) => {
       currentWeight: endDateEntry.currentWeight,
       lastWeight: startDateEntry.currentWeight,
       viewed: false,
+      frequency: message.frequency,
       userId: message.uid,
     });
   }

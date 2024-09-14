@@ -44,6 +44,7 @@ export const progressReport = mysqlTable(
     currentWeight: float("current_weight").notNull(),
     lastWeight: float("last_weight").notNull(),
 	viewed: boolean("viewed").notNull(),
+	frequency: varchar("frequency", { length: 10 }).notNull(),
     userId: varchar("user_id", { length: 36 })
       .notNull()
       .references(() => user.id),
