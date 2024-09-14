@@ -148,6 +148,7 @@ export const lambdaHandler = async (event: SQSEvent, context: Context) => {
       id: crypto.randomUUID(),
       currentWeight: endDateEntry.currentWeight,
       lastWeight: startDateEntry.currentWeight,
+      viewed: false,
       userId: message.uid,
     });
   }
