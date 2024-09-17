@@ -21,26 +21,7 @@ const SQS_QUEUE_URL = process.env.SQS_QUEUE_URL as string;
 export const lambdaHandler = async (event: APIGatewayProxyEvent) => {
   const date = new Date();
 
-  const query = sql`
-      SELECT id from ${user}
-      EXCEPT
-      SELECT user_id as id from ${revenueCatSubscriber}
-      `;
-  const [result, _] = await db.execute(query);
-
-  if (!Array.isArray(result)) {
-    throw new Error(`Except query has failed. ${result}`);
-  }
-
-  const expiredSubsData = await db
-    .select({ id: revenueCatSubscriber.userId })
-    .from(revenueCatSubscriber)
-    .where(lt(revenueCatSubscriber.expirationAtMs, Date.now()));
-  const unsubscribedUserIds = result.flatMap((val) => val.id);
-  const expiredSubscribers = expiredSubsData.flatMap((val) => val.id);
-  const allIds = [...unsubscribedUserIds, ...expiredSubscribers];
-
-  console.log("retrived all free users");
+  const users = await db.select({ id: user.id }).from(user);
 
   const yesterday = new Date(
     date.getUTCFullYear(),
@@ -58,8 +39,8 @@ export const lambdaHandler = async (event: APIGatewayProxyEvent) => {
       : `0${yesterday.getUTCDate()}`
   }`;
 
-  const entries = allIds
-    .map((id) => {
+  const entries = users
+    .map(({ id }) => {
       return { uid: id, frequency: "monthly", startDate, endDate };
     })
     .map((userMessage): SendMessageBatchRequestEntry => {
