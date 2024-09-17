@@ -15,7 +15,7 @@ lint = true
 [default.deploy.parameters]
 capabilities = "CAPABILITY_IAM"
 confirm_changeset = true
-resolve_s3 = true
+resolve_s3 = false
 resolve_image_repos = false
 s3_prefix = "egoist-aws"
 region = "us-east-2"
