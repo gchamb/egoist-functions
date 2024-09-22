@@ -100,7 +100,9 @@ export const lambdaHandler = async (event: SQSEvent, context: Context) => {
 
   const command = `ffmpeg -framerate ${
     message.frequency === "weekly" ? "1" : "3"
-  } -i ${inputPath} -r 30 -c:v libx264 -s 1080x1090 ${outputPath}`;
+  } -i ${inputPath} -r 30 -c:v libx264 -pix_fmt yuv420p -s 1080x1090 ${outputPath}`;
+
+  console.log(`ffmpeg command: ${command}`);
 
   execSync(command);
 
