@@ -134,8 +134,8 @@ export const lambdaHandler = async (event: SQSEvent, context: Context) => {
   console.log("video has been inserted into progress-video ");
 
   // clear the tmp folder
-  await fs.unlink("/tmp/images");
-  await fs.unlink("/tmp/videos");
+  await fs.rm("/tmp/images", { recursive: true, force: true });
+  await fs.rm("/tmp/videos", { recursive: true, force: true });
 
   console.log("tmp folders cleaned up");
 
