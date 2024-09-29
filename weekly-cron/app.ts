@@ -24,7 +24,7 @@ export const lambdaHandler = async () => {
   // get all the current active subscribers
   const activeSubscribers = await db
     .select({
-      id: revenueCatSubscriber.id,
+      id: revenueCatSubscriber.userId,
     })
     .from(revenueCatSubscriber)
     .where(gte(revenueCatSubscriber.expirationAtMs, Date.now()));
