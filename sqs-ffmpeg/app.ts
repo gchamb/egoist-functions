@@ -131,6 +131,7 @@ export const lambdaHandler = async (event: SQSEvent, context: Context) => {
     blobKey: blobKey,
     frequency: message.frequency,
     userId: message.uid,
+    createdAt: message.endDate
   });
 
   console.log("video has been inserted into progress-video ");
