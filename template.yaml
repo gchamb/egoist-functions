@@ -51,6 +51,23 @@ Resources:
       DockerTag: nodejs20.x-v1
       DockerContext: ./weekly-cron
       Dockerfile: Dockerfile
+  DailyCronFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      PackageType: Image
+      Architectures:
+        - x86_64
+      ImageUri: egoist-daily-reminder-cron
+      Events:
+        Weekly:
+          Type: ScheduleV2
+          Properties:
+            ScheduleExpression: cron(0 17 * * * *)
+            ScheduleExpressionTimezone: America/Chicago
+    Metadata:
+      DockerTag: nodejs20.x-v1
+      DockerContext: ./daily-reminder-cron
+      Dockerfile: Dockerfile
   SqsFfmpegFunction:
     Type: AWS::Serverless::Function
     Properties:
