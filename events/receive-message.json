@@ -4,10 +4,10 @@
       "messageId": "19dd0b57-b21e-4ac1-bd88-01bbb068cb78",
       "receiptHandle": "MessageReceiptHandle",
       "body": {
-        "uid": "123",
+        "uid": "2545c0e2-81c3-11ef-a1b9-a2aa7a1b021a",
         "frequency": "monthly",
-        "startDate": "2024-09-01",
-        "endDate": "2024-09-09"
+        "startDate": "2024-10-01",
+        "endDate": "2024-10-30"
       },
       "attributes": {
         "ApproximateReceiveCount": "1",

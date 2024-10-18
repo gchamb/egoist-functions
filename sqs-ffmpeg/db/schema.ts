@@ -1,5 +1,8 @@
 import {
   mysqlTable,
+  mysqlSchema,
+  AnyMySqlColumn,
+  foreignKey,
   primaryKey,
   unique,
   varchar,
@@ -20,7 +23,7 @@ export const progressEntry = mysqlTable(
     currentWeight: float("current_weight").notNull(),
     userId: varchar("user_id", { length: 36 })
       .notNull()
-      .references(() => user.id),
+      .references(() => user.id, { onDelete: "cascade" }),
     // you can use { mode: 'date' }, if you want to have Date as type for this column
     createdAt: date("created_at", { mode: "string" }).default(sql`(curdate())`),
   },
@@ -44,7 +47,7 @@ export const progressReport = mysqlTable(
     lastWeekWeight: float("last_week_weight").notNull(),
     userId: varchar("user_id", { length: 36 })
       .notNull()
-      .references(() => user.id),
+      .references(() => user.id, { onDelete: "cascade" }),
     createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
   },
   (table) => {
@@ -65,9 +68,10 @@ export const progressVideo = mysqlTable(
     blobKey: varchar("blob_key", { length: 255 }).notNull(),
     userId: varchar("user_id", { length: 36 })
       .notNull()
-      .references(() => user.id),
+      .references(() => user.id, { onDelete: "cascade" }),
     frequency: varchar("frequency", { length: 10 }).notNull(),
-    createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
+    // you can use { mode: 'date' }, if you want to have Date as type for this column
+    createdAt: date("created_at", { mode: "string" }).default(sql`(curdate())`),
   },
   (table) => {
     return {
@@ -90,7 +94,7 @@ export const revenueCatSubscriber = mysqlTable(
     expirationAtMs: bigint("expiration_at_ms", { mode: "number" }).notNull(),
     userId: varchar("user_id", { length: 36 })
       .notNull()
-      .references(() => user.id),
+      .references(() => user.id, { onDelete: "cascade" }),
   },
   (table) => {
     return {
@@ -124,15 +128,18 @@ export const user = mysqlTable(
   "user",
   {
     id: varchar("id", { length: 36 }).notNull(),
-    email: varchar("email", { length: 100 }).notNull(),
+    appleId: varchar("apple_id", { length: 100 }),
+    email: varchar("email", { length: 100 }),
     password: varchar("password", { length: 255 }),
     currentWeight: float("current_weight"),
     goalWeight: float("goal_weight"),
     createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
+    expoToken: varchar("expo_token", { length: 255 }),
   },
   (table) => {
     return {
       userId: primaryKey({ columns: [table.id], name: "user_id" }),
+      appleId: unique("apple_id").on(table.appleId),
       email: unique("email").on(table.email),
     };
   }

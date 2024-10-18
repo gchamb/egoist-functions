@@ -1,7 +1,7 @@
 import { SQSEvent, Context } from "aws-lambda";
 import { eq, gte, and, lte } from "drizzle-orm";
 import { db } from "./db";
-import { progressEntry, progressVideo } from "./db/schema";
+import { progressEntry, progressVideo, user } from "./db/schema";
 import {
   S3Client,
   GetObjectCommand,
@@ -11,6 +11,7 @@ import fs from "fs/promises";
 import "dotenv/config";
 import { execSync } from "child_process";
 import crypto from "crypto";
+import { ExpoPushMessage, Expo } from "expo-server-sdk";
 
 const client = new S3Client({
   region: "us-east-2",
@@ -61,6 +62,10 @@ export const lambdaHandler = async (event: SQSEvent, context: Context) => {
         lte(progressEntry.createdAt, message.endDate)
       )
     );
+
+  if (entries.length === 0) {
+    return;
+  }
 
   console.log("entries have been acquired", entries);
 
@@ -131,7 +136,7 @@ export const lambdaHandler = async (event: SQSEvent, context: Context) => {
     blobKey: blobKey,
     frequency: message.frequency,
     userId: message.uid,
-    createdAt: message.endDate
+    createdAt: message.endDate,
   });
 
   console.log("video has been inserted into progress-video ");
@@ -141,6 +146,33 @@ export const lambdaHandler = async (event: SQSEvent, context: Context) => {
   await fs.rm("/tmp/videos", { recursive: true, force: true });
 
   console.log("tmp folders cleaned up");
+
+  // send push notification
+  const expoTokens = await db
+    .select({ expoToken: user.expoToken })
+    .from(user)
+    .where(eq(user.id, message.uid));
+
+  console.log("fetching expo token");
+
+  const expo = new Expo();
+
+  const pushMessages: ExpoPushMessage[] = [];
+
+  for (const token of expoTokens) {
+    if (token.expoToken) {
+      pushMessages.push({
+        to: token.expoToken,
+        title: "Egoist",
+        body: "Your progress video is now ready.",
+        data: { url: "/show-all-assets?type=progress-video" },
+      });
+    }
+  }
+
+  const tickets = await expo.sendPushNotificationsAsync(pushMessages);
+
+  console.log(`Successfully created tickets: ${tickets}`);
 
   return {
     blobKey,
